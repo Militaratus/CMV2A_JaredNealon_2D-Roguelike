@@ -148,9 +148,37 @@ namespace Completed
 			
 			//Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
 			LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
-			
+
+            /* Old Code
 			//Instantiate the exit tile in the upper right hand corner of our game board
 			Instantiate (exit, new Vector3 (columns - 1, rows - 1, 0f), Quaternion.identity);
-		}
+            */
+
+            // Refactored Code from Jared
+            //Instantiate the exit tile in one of the corners of our game board
+            SpawnExit();
+        }
+
+        // Define which one of now three exit spawn points to use and actually spawn the exit
+        void SpawnExit()
+        {
+            int spawnLocation = Random.Range(0, 3);
+            int spawnColumn = 0;
+            int spawnRow = 0;
+
+            switch (spawnLocation)
+            {
+                case 0:
+                    spawnColumn = 0; spawnRow = rows - 1; break;
+                case 1:
+                    spawnColumn = columns - 1; spawnRow = rows - 1; break;
+                case 2:
+                    spawnColumn = columns - 1; spawnRow = 0; break;
+                default:
+                    spawnColumn = columns - 1; spawnRow = rows - 1; break;
+            }
+
+            Instantiate(exit, new Vector3(spawnColumn, spawnRow, 0f), Quaternion.identity);
+        }
 	}
 }

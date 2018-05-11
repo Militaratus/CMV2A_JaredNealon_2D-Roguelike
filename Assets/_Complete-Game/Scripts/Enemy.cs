@@ -37,7 +37,11 @@ namespace Completed
 
             //Call the start function of our base class MovingObject.
             base.Start ();
-		}
+
+            // Refactor from Jared
+            // Start the Disco Mode
+            StartDiscoMode();
+        }
 		
 		
 		//Override the AttemptMove function of MovingObject to include functionality needed for Enemy to skip turns.
@@ -101,27 +105,12 @@ namespace Completed
 			SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
 		}
 
-        private void FixedUpdate()
-        {
-            if (discoMode && !discoModeActivated)
-            {
-                StartDiscoMode();
-            }
-
-            if (!discoMode && discoModeActivated)
-            {
-                discoModeActivated = false;
-                if (discoRoutine != null)
-                {
-                    StopCoroutine(discoRoutine);
-                    discoRoutine = null;
-                }
-            }
-        }
-
+        /// <summary>
+        /// Refactor functions from Jared to activate Disco mode
+        /// </summary>
+        // This function kills the Coroutine, and restarts it again fresh.
         void StartDiscoMode()
         {
-            discoModeActivated = true;
             if (discoRoutine != null)
             {
                 StopCoroutine(discoRoutine);
@@ -132,14 +121,18 @@ namespace Completed
             StartCoroutine(discoRoutine);
         }
 
+        // This Coroutine causes the color of the sprite to change and flip, then cool down for a moment
         IEnumerator DiscoCoroutine()
         {
-            yield return new WaitForSeconds(0.1f);
-            if (discoMode)
-            {
-                myRenderer.color = new Color(Random.Range(0.00f, 1.00f), Random.Range(0.00f, 1.00f), Random.Range(0.00f, 1.00f));
-                myRenderer.flipX = !myRenderer.flipX;
-            }
+            // Assign a random color and flip the sprite
+            myRenderer.color = new Color(Random.Range(0.00f, 1.00f), Random.Range(0.00f, 1.00f), Random.Range(0.00f, 1.00f));
+            myRenderer.flipX = !myRenderer.flipX;
+
+            // Wait a tick
+            float cooldown = Random.Range(0.1f, 0.5f);
+            yield return new WaitForSeconds(cooldown);
+
+            // Restart the Coroutine
             StartDiscoMode();
         }
     }
