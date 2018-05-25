@@ -106,7 +106,7 @@ namespace Completed
 			
 			//Get a component reference to the component of type T attached to the object that was hit
 			T hitComponent = hit.transform.GetComponent <T> ();
-			
+
 			//If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
 			if(!canMove && hitComponent != null)
 				

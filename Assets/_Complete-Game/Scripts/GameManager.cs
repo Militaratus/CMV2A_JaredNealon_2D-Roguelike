@@ -12,12 +12,18 @@ namespace Completed
 		public float levelStartDelay = 2f;						//Time to wait before starting level, in seconds.
 		public float turnDelay = 0.1f;							//Delay between each Player turn.
 		public int playerFoodPoints = 100;						//Starting value for Player food points.
-		public static GameManager instance = null;				//Static instance of GameManager which allows it to be accessed by any other script.
+        public int playerGoldPoints = 0;                      //[JARED] Starting value for Player gold points.
+        public static GameManager instance = null;				//Static instance of GameManager which allows it to be accessed by any other script.
 		[HideInInspector] public bool playersTurn = true;		//Boolean to check if it's players turn, hidden in inspector but public.
 		
 		
 		private Text levelText;									//Text to display current level number.
-		private GameObject levelImage;							//Image to block out level as levels are being set up, background for levelText.
+        private Text gameFoodText;                              //[JARED] Text to display remaining food number.
+        private Text gameGoldText;                              //[JARED] Text to display remaining gold number. 
+        private Text gameHintText;                              //[JARED] Text to display gameplay hints. 
+        private List<string> gameplayHints;                     //List of all gameplay hints, used to store a generated list.
+        private GameObject menuImage;                           //[JARED] Image to block out level as game is being set up.
+        private GameObject levelImage;							//Image to block out level as levels are being set up, background for levelText.
 		private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
 		private int level = 1;									//Current level number, expressed in game as "Day 1".
 		private List<Enemy> enemies;							//List of all Enemy units, used to issue them move commands.
@@ -51,7 +57,7 @@ namespace Completed
 			boardScript = GetComponent<BoardManager>();
 			
 			//Call the InitGame function to initialize the first level 
-			InitGame();
+			//InitGame();
 		}
 
         //this is called only once, and the paramter tell it to be called only after the scene was loaded
@@ -72,22 +78,46 @@ namespace Completed
 
 		
 		//Initializes the game for each level.
-		void InitGame()
+		public void InitGame()
 		{
 			//While doingSetup is true the player can't move, prevent player from moving while title card is up.
 			doingSetup = true;
-			
-			//Get a reference to our image LevelImage by finding it by name.
-			levelImage = GameObject.Find("LevelImage");
+
+            //[JARED] Get a reference to our image LevelImage by finding it by name.
+            menuImage = GameObject.Find("MenuImage");
+
+            //Get a reference to our image LevelImage by finding it by name.
+            levelImage = GameObject.Find("LevelImage");
 			
 			//Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
 			levelText = GameObject.Find("LevelText").GetComponent<Text>();
-			
-			//Set the text of levelText to the string "Day" and append the current level number.
-			levelText.text = "Day " + level;
-			
-			//Set levelImage to active blocking player's view of the game board during setup.
-			levelImage.SetActive(true);
+
+            //[JARED] Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
+            gameFoodText = GameObject.Find("GameFoodText").GetComponent<Text>();
+
+            //[JARED] Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
+            gameGoldText = GameObject.Find("GameGoldText").GetComponent<Text>();
+
+            //[JARED] Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
+            gameHintText = GameObject.Find("GameHintText").GetComponent<Text>();
+
+            //Set the text of levelText to the string "Day" and append the current level number.
+            levelText.text = "Day " + level;
+
+            //Set the text of gameFoodText to the string "x" and append the current food number.
+            gameFoodText.text = "x " + playerFoodPoints;
+
+            //[JARED] Set the text of gameGoldText to the string "x" and append the current gold number.
+            gameGoldText.text = "x " + playerGoldPoints;
+
+            //[JARED] Set the text of gameHintText to the string.
+            gameHintText.text = GetGameplayHint();
+
+            //[JARED] Set menuImage to inactive to stop blocking player's view of the levelImage.
+            menuImage.SetActive(false);
+
+            //Set levelImage to active blocking player's view of the game board during setup.
+            levelImage.SetActive(true);
 			
 			//Call the HideLevelImage function with a delay in seconds of levelStartDelay.
 			Invoke("HideLevelImage", levelStartDelay);
@@ -99,6 +129,47 @@ namespace Completed
 			boardScript.SetupScene(level);
 			
 		}
+
+        //[JARED] Generate gameplay hints
+        void GenerateGameplayHints()
+        {
+            gameplayHints = new List<string>();
+            gameplayHints.Add("No Food means Game Over.");
+            gameplayHints.Add("Every action costs 1 Food.");
+            gameplayHints.Add("Avoid Zombies at all cost.");
+            gameplayHints.Add("Zombies steal your food.");
+            gameplayHints.Add("Collect Food to survive.");
+            gameplayHints.Add("Collect Tomatoes for some Food.");
+            gameplayHints.Add("Collect Soda for more Food.");
+            gameplayHints.Add("Collect Golden Soda for Gold.");
+            gameplayHints.Add("Gold can be traded for Food later.");
+            gameplayHints.Add("Disco is Undead.");
+            gameplayHints.Add("Unclothed Zombies are chill.");
+            gameplayHints.Add("Clothes make Zombies angry.");
+        }
+
+        //[JARED] Get a random gameplay hint
+        string GetGameplayHint()
+        {
+            string gameplayHint = "";
+
+            if (level % 5 == 0 || level == 1)
+            {
+                gameplayHint = "Spend Gold to get Food.";
+            }
+            else
+            {
+                if (gameplayHints == null || gameplayHints.Count == 0)
+                {
+                    GenerateGameplayHints();
+                }
+
+                int hintID = Random.Range(0, gameplayHints.Count);
+                gameplayHint = gameplayHints[hintID];
+            }
+
+            return gameplayHint;
+        }
 		
 		
 		//Hides black image used between levels
@@ -137,9 +208,15 @@ namespace Completed
 		{
 			//Set levelText to display number of levels passed and game over message
 			levelText.text = "After " + level + " days, you starved.";
-			
-			//Enable black background image gameObject.
-			levelImage.SetActive(true);
+
+            //Set the text of gameFoodText to the string "x" and append the current food number.
+            gameFoodText.text = "x " + playerFoodPoints;
+
+            //[JARED] Set the text of gameGoldText to the string "x" and append the current gold number.
+            gameGoldText.text = "x " + playerGoldPoints;
+
+            //Enable black background image gameObject.
+            levelImage.SetActive(true);
 			
 			//Disable this GameManager.
 			enabled = false;

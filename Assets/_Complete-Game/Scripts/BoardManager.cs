@@ -30,12 +30,15 @@ namespace Completed
 		public int rows = 8;											//Number of rows in our game board.
 		public Count wallCount = new Count (5, 9);						//Lower and upper limit for our random number of walls per level.
 		public Count foodCount = new Count (1, 5);						//Lower and upper limit for our random number of food items per level.
-		public GameObject exit;											//Prefab to spawn for exit.
+        public Count goldCount = new Count(1, 5);                       //[JARED] Lower and upper limit for our random number of gold items per level.
+        public GameObject exit;											//Prefab to spawn for exit.
 		public GameObject[] floorTiles;									//Array of floor prefabs.
 		public GameObject[] wallTiles;									//Array of wall prefabs.
 		public GameObject[] foodTiles;									//Array of food prefabs.
-		public GameObject[] enemyTiles;									//Array of enemy prefabs.
-		public GameObject[] outerWallTiles;								//Array of outer tile prefabs.
+        public GameObject[] goldTiles;                                  //[JARED] Array of gold prefabs.
+        public GameObject[] enemyTiles;									//Array of enemy prefabs.
+        public GameObject[] npcTiles;                                   //[JARED] Array of npc prefabs.  
+        public GameObject[] outerWallTiles;								//Array of outer tile prefabs.
 		
 		private Transform boardHolder;									//A variable to store a reference to the transform of our Board object.
 		private List <Vector3> gridPositions = new List <Vector3> ();	//A list of possible locations to place tiles.
@@ -139,15 +142,28 @@ namespace Completed
 			
 			//Instantiate a random number of wall tiles based on minimum and maximum, at randomized positions.
 			LayoutObjectAtRandom (wallTiles, wallCount.minimum, wallCount.maximum);
-			
-			//Instantiate a random number of food tiles based on minimum and maximum, at randomized positions.
-			LayoutObjectAtRandom (foodTiles, foodCount.minimum, foodCount.maximum);
-			
-			//Determine number of enemies based on current level number, based on a logarithmic progression
-			int enemyCount = (int)Mathf.Log(level, 2f);
-			
-			//Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
-			LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
+
+            //[JARED] Check if we are at a bonus level yet
+            if (level % 5 == 0 || level == 1)
+            {
+                //Instantiate a static number of npc's, at randomized position.
+                int npcCount = 1;
+                LayoutObjectAtRandom(npcTiles, npcCount, npcCount);
+            }
+            else
+            {
+                //Instantiate a random number of food tiles based on minimum and maximum, at randomized positions.
+                LayoutObjectAtRandom(foodTiles, foodCount.minimum, foodCount.maximum);
+
+                //Instantiate a random number of food tiles based on minimum and maximum, at randomized positions.
+                LayoutObjectAtRandom(goldTiles, goldCount.minimum, goldCount.maximum);
+
+                //Determine number of enemies based on current level number, based on a logarithmic progression
+                int enemyCount = (int)Mathf.Log(level, 2f);
+
+                //Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
+                LayoutObjectAtRandom(enemyTiles, enemyCount, enemyCount);
+            }
 
             /* Old Code
 			//Instantiate the exit tile in the upper right hand corner of our game board

@@ -16,7 +16,6 @@ namespace Completed
 		private bool skipMove;                              //Boolean to determine whether or not enemy should skip a turn or move this turn.
 
         public bool discoMode = true;
-        private bool discoModeActivated = false;
         private SpriteRenderer myRenderer;
         private IEnumerator discoRoutine;
 		

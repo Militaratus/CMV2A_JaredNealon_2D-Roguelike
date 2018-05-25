@@ -11,9 +11,11 @@ namespace Completed
 		public float restartLevelDelay = 1f;		//Delay time in seconds to restart level.
 		public int pointsPerFood = 10;				//Number of points to add to player food points when picking up a food object.
 		public int pointsPerSoda = 20;				//Number of points to add to player food points when picking up a soda object.
-		public int wallDamage = 1;					//How much damage a player does to a wall when chopping it.
+        public int pointsPerGold = 1;              //Number of points to add to player gold points when picking up a gold object.
+        public int wallDamage = 1;					//How much damage a player does to a wall when chopping it.
 		public Text foodText;						//UI Text to display current player food total.
-		public AudioClip moveSound1;				//1 of 2 Audio clips to play when player moves.
+        public Text goldText;                       //[JARED] UI Text to display current player food total.
+        public AudioClip moveSound1;				//1 of 2 Audio clips to play when player moves.
 		public AudioClip moveSound2;				//2 of 2 Audio clips to play when player moves.
 		public AudioClip eatSound1;					//1 of 2 Audio clips to play when player collects a food object.
 		public AudioClip eatSound2;					//2 of 2 Audio clips to play when player collects a food object.
@@ -23,13 +25,14 @@ namespace Completed
 		
 		private Animator animator;					//Used to store a reference to the Player's animator component.
 		private int food;                           //Used to store player food points total during level.
+        private int gold;                           //[JARED] Used to store player gold points total during level.
 #if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 #endif
-		
-		
-		//Start overrides the Start function of MovingObject
-		protected override void Start ()
+
+
+        //Start overrides the Start function of MovingObject
+        protected override void Start ()
 		{
 			//Get a component reference to the Player's animator component
 			animator = GetComponent<Animator>();
@@ -39,9 +42,15 @@ namespace Completed
 			
 			//Set the foodText to reflect the current player food total.
 			foodText.text = "Food: " + food;
-			
-			//Call the Start function of the MovingObject base class.
-			base.Start ();
+
+            //[JARED] Get the current food point total stored in GameManager.instance between levels.
+            gold = GameManager.instance.playerGoldPoints;
+
+            //[JARED] Set the foodText to reflect the current player food total.
+            goldText.text = "Gold: " + gold;
+
+            //Call the Start function of the MovingObject base class.
+            base.Start ();
 		}
 		
 		
@@ -50,7 +59,10 @@ namespace Completed
 		{
 			//When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
 			GameManager.instance.playerFoodPoints = food;
-		}
+
+            //[JARED] When Player object is disabled, store the current local gold total in the GameManager so it can be re-loaded in next level.
+            GameManager.instance.playerGoldPoints = gold;
+        }
 		
 		
 		private void Update ()
@@ -123,7 +135,15 @@ namespace Completed
 				//Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
 				//Pass in horizontal and vertical as parameters to specify the direction to move Player in.
 				AttemptMove<Wall> (horizontal, vertical);
-			}
+
+                //[JARED] Call AttemptMove passing in the generic parameter NPC, since that is what Player may interact with if they encounter one (by attacking it)
+                //Pass in horizontal and vertical as parameters to specify the direction to move Player in.
+                AttemptMove<NPC>(horizontal, vertical);
+
+                //[JARED] Conspensate double attempt moves
+                food += 1;
+                foodText.text = "Food: " + food;
+            }
 		}
 		
 		//AttemptMove overrides the AttemptMove function in the base class MovingObject
@@ -135,9 +155,12 @@ namespace Completed
 			
 			//Update food text display to reflect current score.
 			foodText.text = "Food: " + food;
-			
-			//Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
-			base.AttemptMove <T> (xDir, yDir);
+
+            //[JARED] Update food text display to reflect current score.
+            goldText.text = "Gold: " + gold;
+
+            //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
+            base.AttemptMove <T> (xDir, yDir);
 			
 			//Hit allows us to reference the result of the Linecast done in Move.
 			RaycastHit2D hit;
@@ -155,21 +178,47 @@ namespace Completed
 			//Set the playersTurn boolean of GameManager to false now that players turn is over.
 			GameManager.instance.playersTurn = false;
 		}
-		
-		
-		//OnCantMove overrides the abstract function OnCantMove in MovingObject.
-		//It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
-		protected override void OnCantMove <T> (T component)
-		{
-			//Set hitWall to equal the component passed in as a parameter.
-			Wall hitWall = component as Wall;
-			
-			//Call the DamageWall function of the Wall we are hitting.
-			hitWall.DamageWall (wallDamage);
-			
-			//Set the attack trigger of the player's animation controller in order to play the player's attack animation.
-			animator.SetTrigger ("playerChop");
-		}
+
+
+        //OnCantMove overrides the abstract function OnCantMove in MovingObject.
+        //It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
+        protected override void OnCantMove<T>(T component)
+        {
+            if (component == component as Wall)
+            {
+                //Set hitWall to equal the component passed in as a parameter.
+                Wall hitWall = component as Wall;
+
+                //Call the DamageWall function of the Wall we are hitting.
+                hitWall.DamageWall(wallDamage);
+
+                //Set the attack trigger of the player's animation controller in order to play the player's attack animation.
+                animator.SetTrigger("playerChop");
+            }
+
+            if (component == component as NPC)
+            {
+                BuyFood();
+            }
+        }
+
+        void BuyFood()
+        {
+            if (gold > 0)
+            {
+                //Add pointsPerSoda to players food points total
+                food += pointsPerSoda + 2;
+
+                //Update foodText to represent current total and notify player that they gained points
+                foodText.text = "+" + pointsPerSoda + " Food: " + food;
+
+                //Add pointsPerSoda to players food points total
+                gold -= 1;
+
+                //Update foodText to represent current total and notify player that they gained points
+                goldText.text = "-" + pointsPerGold + " Gold: " + gold;
+            }
+        }
 		
 		
 		//OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
@@ -216,7 +265,20 @@ namespace Completed
 				//Disable the soda object the player collided with.
 				other.gameObject.SetActive (false);
 			}
-		}
+
+            //Check if the tag of the trigger collided with is Soda.
+            else if (other.tag == "Gold")
+            {
+                //Add pointsPerSoda to players food points total
+                gold += 1;
+
+                //Update foodText to represent current total and notify player that they gained points
+                goldText.text = "+" + pointsPerGold + " Gold: " + gold;
+
+                //Disable the soda object the player collided with.
+                other.gameObject.SetActive(false);
+            }
+        }
 		
 		
 		//Restart reloads the scene when called.
