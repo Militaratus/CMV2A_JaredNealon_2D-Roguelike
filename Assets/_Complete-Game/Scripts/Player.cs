@@ -319,9 +319,15 @@ namespace Completed
 				
 				//Stop the background music.
 				SoundManager.instance.musicSource.Stop();
-				
-				//Call the GameOver function of GameManager.
-				GameManager.instance.GameOver ();
+
+                //[JARED] When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
+                GameManager.instance.playerFoodPoints = food;
+
+                //[JARED] When Player object is disabled, store the current local gold total in the GameManager so it can be re-loaded in next level.
+                GameManager.instance.playerGoldPoints = gold;
+
+                //Call the GameOver function of GameManager.
+                GameManager.instance.GameOver ();
 			}
 		}
 	}

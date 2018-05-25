@@ -215,6 +215,9 @@ namespace Completed
             //[JARED] Set the text of gameGoldText to the string "x" and append the current gold number.
             gameGoldText.text = "x " + playerGoldPoints;
 
+            //[JARED] Set the text of gameHintText to the string.
+            gameHintText.text = "Game Over!";
+
             //Enable black background image gameObject.
             levelImage.SetActive(true);
 			
