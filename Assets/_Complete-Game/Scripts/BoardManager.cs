@@ -41,8 +41,12 @@ namespace Completed
         public GameObject[] outerWallTiles;								//Array of outer tile prefabs.
 		
 		private Transform boardHolder;									//A variable to store a reference to the transform of our Board object.
-		private List <Vector3> gridPositions = new List <Vector3> ();	//A list of possible locations to place tiles.
-		
+		private List <Vector3> gridPositions = new List <Vector3> ();   //A list of possible locations to place tiles.
+
+        //[JARED] Keep track of counts for analytics
+        internal int levelEnemyCount;
+        internal int levelFoodCount;
+        internal int levelGoldCount;
 		
 		//Clears our list gridPositions and prepares it to generate a new board.
 		void InitialiseList ()
@@ -115,9 +119,23 @@ namespace Completed
 		{
 			//Choose a random number of objects to instantiate within the minimum and maximum limits
 			int objectCount = Random.Range (minimum, maximum+1);
-			
-			//Instantiate objects until the randomly chosen limit objectCount is reached
-			for(int i = 0; i < objectCount; i++)
+
+            //[JARED] Store objectCounts
+            if (tileArray == enemyTiles)
+            {
+                levelEnemyCount = objectCount;
+            }
+            if (tileArray == foodTiles)
+            {
+                levelFoodCount = objectCount;
+            }
+            if (tileArray == goldTiles)
+            {
+                levelGoldCount = objectCount;
+            }
+
+            //Instantiate objects until the randomly chosen limit objectCount is reached
+            for (int i = 0; i < objectCount; i++)
 			{
 				//Choose a position for randomPosition by getting a random position from our list of available Vector3s stored in gridPosition
 				Vector3 randomPosition = RandomPosition();

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Analytics;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
@@ -28,9 +29,9 @@ namespace Completed
 		private int level = 1;									//Current level number, expressed in game as "Day 1".
 		private List<Enemy> enemies;							//List of all Enemy units, used to issue them move commands.
 		private bool enemiesMoving;								//Boolean to check if enemies are moving.
-		private bool doingSetup = true;							//Boolean to check if we're setting up board, prevent Player from moving during setup.
-		
-		
+		private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
+
+        private float levelStart;
 		
 		//Awake is always called before any Start functions
 		void Awake()
@@ -127,8 +128,30 @@ namespace Completed
 			
 			//Call the SetupScene function of the BoardManager script, pass it current level number.
 			boardScript.SetupScene(level);
-			
+
+            //[JARED] Set levelStart to current time to use later.
+            levelStart = Time.time;
 		}
+
+        //[JARED] Collect all the neccessary analytics
+        public void SendLevelAnalytics(string analyticsEvent)
+        {
+            float duration = Time.time - levelStart;
+            int foodLeft = boardScript.levelFoodCount - GameObject.FindGameObjectsWithTag("Food").Length;
+            int goldLeft = boardScript.levelGoldCount - GameObject.FindGameObjectsWithTag("Gold").Length;
+            Analytics.CustomEvent(analyticsEvent, new Dictionary<string, object>
+            {
+                { "level", level - 1 },
+                { "duration", duration },
+                { "foodPoints", playerFoodPoints },
+                { "goldPoints", playerGoldPoints },
+                { "enemyCount", boardScript.levelEnemyCount },
+                { "foodSeeded", boardScript.levelFoodCount },
+                { "foodLeft", foodLeft },
+                { "goldSeeded", boardScript.levelGoldCount },
+                { "goldLeft", goldLeft }
+            });
+        }
 
         //[JARED] Generate gameplay hints
         void GenerateGameplayHints()
@@ -206,8 +229,11 @@ namespace Completed
 		//GameOver is called when the player reaches 0 food points
 		public void GameOver()
 		{
-			//Set levelText to display number of levels passed and game over message
-			levelText.text = "After " + level + " days, you starved.";
+            //[JARED] Send GameOver stats
+            SendLevelAnalytics("GameOver");
+
+            //Set levelText to display number of levels passed and game over message
+            levelText.text = "After " + level + " days, you starved.";
 
             //Set the text of gameFoodText to the string "x" and append the current food number.
             gameFoodText.text = "x " + playerFoodPoints;
