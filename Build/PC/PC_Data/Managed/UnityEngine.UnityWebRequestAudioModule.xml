@@ -14,16 +14,6 @@
         <para>Returns the downloaded AudioClip, or null. (Read Only)</para>
       </summary>
     </member>
-    <member name="P:UnityEngine.Networking.DownloadHandlerAudioClip.compressed">
-      <summary>
-        <para>Create AudioClip that is compressed in memory.</para>
-      </summary>
-    </member>
-    <member name="P:UnityEngine.Networking.DownloadHandlerAudioClip.streamAudio">
-      <summary>
-        <para>Create streaming AudioClip.</para>
-      </summary>
-    </member>
     <member name="M:UnityEngine.Networking.DownloadHandlerAudioClip.#ctor(System.String,UnityEngine.AudioType)">
       <summary>
         <para>Constructor, specifies what kind of audio data is going to be downloaded.</para>

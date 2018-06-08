@@ -4341,7 +4341,7 @@ GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.</param>
       <param name="position"></param>
       <param name="content"></param>
       <param name="controlID"></param>
-      <param name="character"></param>
+      <param name="Character"></param>
     </member>
     <member name="M:UnityEngine.GUIStyle.DrawWithTextSelection(UnityEngine.Rect,UnityEngine.GUIContent,System.Int32,System.Int32,System.Int32)">
       <summary>
@@ -4477,8 +4477,7 @@ GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.</param>
       </summary>
       <param name="hint"></param>
       <param name="focus"></param>
-      <param name="focusType"></param>
-      <param name="rect"></param>
+      <param name="position"></param>
     </member>
     <member name="M:UnityEngine.GUIUtility.GetControlID(System.Int32,UnityEngine.FocusType,UnityEngine.Rect)">
       <summary>
@@ -4486,8 +4485,7 @@ GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.</param>
       </summary>
       <param name="hint"></param>
       <param name="focus"></param>
-      <param name="focusType"></param>
-      <param name="rect"></param>
+      <param name="position"></param>
     </member>
     <member name="M:UnityEngine.GUIUtility.GetControlID(UnityEngine.GUIContent,UnityEngine.FocusType)">
       <summary>

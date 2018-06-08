@@ -126,21 +126,6 @@
         <para>Update the AudioMixer with unscaled realtime.</para>
       </summary>
     </member>
-    <member name="T:UnityEngine.Audio.AudioPlayableBinding">
-      <summary>
-        <para>A PlayableBinding that contains information representing an AudioPlayableOutput.</para>
-      </summary>
-    </member>
-    <member name="M:UnityEngine.Audio.AudioPlayableBinding.Create(System.String,UnityEngine.Object)">
-      <summary>
-        <para>Creates a PlayableBinding that contains information representing an AudioPlayableOutput.</para>
-      </summary>
-      <param name="key">A reference to a UnityEngine.Object that acts as a key for this binding.</param>
-      <param name="name">The name of the AudioPlayableOutput.</param>
-      <returns>
-        <para>Returns a PlayableBinding that contains information that is used to create an AudioPlayableOutput.</para>
-      </returns>
-    </member>
     <member name="T:UnityEngine.Audio.AudioPlayableOutput">
       <summary>
         <para>A IPlayableOutput implementation that will be used to play audio.</para>
@@ -157,24 +142,10 @@
         <para>A new AudioPlayableOutput attached to the PlayableGraph.</para>
       </returns>
     </member>
-    <member name="M:UnityEngine.Audio.AudioPlayableOutput.GetEvaluateOnSeek">
-      <summary>
-        <para>Gets the state of output playback when seeking.</para>
-      </summary>
-      <returns>
-        <para>Returns true if the output plays when seeking. Returns false otherwise.</para>
-      </returns>
-    </member>
     <member name="P:UnityEngine.Audio.AudioPlayableOutput.Null">
       <summary>
         <para>Returns an invalid AudioPlayableOutput.</para>
       </summary>
-    </member>
-    <member name="M:UnityEngine.Audio.AudioPlayableOutput.SetEvaluateOnSeek(System.Boolean)">
-      <summary>
-        <para>Controls whether the output should play when seeking.</para>
-      </summary>
-      <param name="value">Set to true to play the output when seeking. Set to false to disable audio scrubbing on this output. Default is true.</param>
     </member>
     <member name="T:UnityEngine.AudioChorusFilter">
       <summary>
